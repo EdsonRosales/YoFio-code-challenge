@@ -33,7 +33,6 @@ export default function AppRoundedScreen({
 
 const styles = StyleSheet.create({
 	background: {
-		backgroundColor: "red",
 		flex: 1,
 	},
 	container: {

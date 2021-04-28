@@ -1,10 +1,13 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import MainFormScreen from './app/screens/MainFormScreen';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 export default function App() {
   return (
-    <MainFormScreen />
+    <SafeAreaProvider>
+      <MainFormScreen />
+    </SafeAreaProvider>
   );
 }
 
