@@ -1,14 +1,29 @@
+//MAIN
 import React, { useState } from 'react'
 import { StyleSheet, Text, TextInput, View } from 'react-native'
 import { Header } from 'react-native-elements';
+
+//CUSTOM
 import Button from '../components/basicComponents/Button';
 import Screen from '../components/basicComponents/Screen';
 import ButtonDatePicker from '../components/customComponents/ButtonDatePicker';
 import CustomDatePicker from '../components/customComponents/CustomDatePicker';
 import ImagePickerInput from '../components/customComponents/ImagePickerInput';
+import ErrorMessage from '../components/basicComponents/ErrorMessage';
+
+//CONFIG
 import colors from '../config/colors';
 
+//VALIDATION
+import { Formik } from 'formik';
+import * as Yup from 'yup';
+
 export default function MainFormScreen() {
+    //VALIDATION SCHEMA
+    const validationSchema = Yup.object().shape({
+        names: Yup.string().required().label("Nombre"),
+        lastName: Yup.string().required().label("Apellidos")
+    })
 
     //STATES
     const [show, setShow] = useState(false);
@@ -45,58 +60,81 @@ export default function MainFormScreen() {
                     style={{shadowColor: 'transparent',}}
                 />
 
-                <View style={{flexDirection:"column"}}>
+                <Formik
+                    initialValues={{ names: '', lastName: '', birthDate: '' }}
+                    onSubmit={values => console.log(values)}
+                    validationSchema={validationSchema}
+                >
+                    {({ handleChange, handleSubmit, errors, setFieldTouched, touched }) => (
+                        <>
+                            <View style={{flexDirection:"column"}}>
 
-                    <View style={styles.container} >
-                        <TextInput placeholder="Nombre" style={[styles.shadowBox, styles.containerInput]} />
-                        <TextInput placeholder="Email" style={[styles.shadowBox, styles.containerInput]} />
+                                <View style={styles.container} >
+                                    <TextInput 
+                                        placeholder="Nombre(s)" 
+                                        style={[styles.shadowBox, styles.containerInput]}
+                                        onBlur={() => setFieldTouched("names")}
+                                        onChangeText={handleChange("names")}
+                                    />
+                                    <ErrorMessage error={errors.names} visible={touched.names} />
 
-                        <View style={{marginTop: 10}}>
-                            <View>
-                                <ButtonDatePicker 
-                                    onPress={() => showDatepicker()}
-                                    title="Fecha de Nacimiento"
-                                />
+                                    <TextInput 
+                                        placeholder="Apellidos" 
+                                        style={[styles.shadowBox, styles.containerInput]}
+                                        onBlur={() => setFieldTouched("lastName")}
+                                        onChangeText={handleChange("lastName")}
+                                    />
+                                    <ErrorMessage error={errors.lastName} visible={touched.lastName} />
+
+                                    <View style={{marginTop: 10}}>
+                                        <View>
+                                            <ButtonDatePicker 
+                                                onPress={() => showDatepicker()}
+                                                title="Fecha de Nacimiento"
+                                            />
+                                        </View>
+
+                                        <CustomDatePicker
+                                            visible={show}
+                                            value={date}
+                                            mode={mode}
+                                            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                                            textColor="grey"
+                                            locale="es-ES"
+                                            style={{
+                                            borderRadius: 10,
+                                            }}
+                                            onChange={(option) => {
+                                            if (option.type !== 'dismissed') {
+                                                onChange(option);
+                                                setShow(false);
+                                            } else setShow(false);
+                                            }}
+                                            onClose={() => setShow(false)}
+                                        />
+                                    </View>
+
+                                    <View style={{marginTop: 10, alignItems: 'center'}}>
+                                        <ImagePickerInput
+                                            imageUri={imageUri}
+                                            onChangeImage={(uri) => {
+                                            handleChange('image')(uri);
+                                            setimageUri(uri);
+                                            }}
+                                        />
+                                    </View>
+                                    
+                                    <View style={{marginTop: 10}}>
+                                        <Button
+                                            title="Guardar"
+                                            onPress={handleSubmit}
+                                        />
+                                    </View>
+                                </View>
                             </View>
-
-                            <CustomDatePicker
-                                visible={show}
-                                value={date}
-                                mode={mode}
-                                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                                textColor="grey"
-                                locale="es-ES"
-                                style={{
-                                borderRadius: 10,
-                                }}
-                                onChange={(option) => {
-                                if (option.type !== 'dismissed') {
-                                    onChange(option);
-                                    setShow(false);
-                                } else setShow(false);
-                                }}
-                                onClose={() => setShow(false)}
-                            />
-                        </View>
-
-                        <View style={{marginTop: 10, alignItems: 'center'}}>
-                            <ImagePickerInput
-                                imageUri={imageUri}
-                                onChangeImage={(uri) => {
-                                handleChange('image')(uri);
-                                setimageUri(uri);
-                                }}
-                            />
-                        </View>
-                        
-                        <View style={{marginTop: 10}}>
-                            <Button
-                                title="Guardar"
-                                // onPress={handleSubmit}
-                            />
-                        </View>
-                    </View>
-                </View>
+                        </>
+                    )}
+                </Formik>
             </View>
         </Screen>
     )

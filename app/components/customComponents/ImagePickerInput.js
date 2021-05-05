@@ -17,7 +17,7 @@ function ImagePickerInput({ imageUri, onChangeImage, style, image }) {
   const refRBSheet = useRef();
 
   const openGallery = async () => {
-    const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+    const { status } = await Permissions.askAsync(Permissions.MEDIA_LIBRARY);
     if (status !== 'granted') {
       alert('Necesitas permisos para acceder a tus imagenes.');
       return;
