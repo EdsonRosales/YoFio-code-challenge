@@ -133,7 +133,7 @@ function ImagePickerInput({ imageUri, onChangeImage, style, image }) {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    borderRadius: 20,
+    borderRadius: 10,
     height: 100,
     justifyContent: 'center',
     overflow: 'hidden',

@@ -10,6 +10,10 @@ import ButtonDatePicker from '../components/customComponents/ButtonDatePicker';
 import CustomDatePicker from '../components/customComponents/CustomDatePicker';
 import ImagePickerInput from '../components/customComponents/ImagePickerInput';
 import ErrorMessage from '../components/basicComponents/ErrorMessage';
+import Spinner from "react-native-loading-spinner-overlay";
+
+//API
+import general from '../api/general';
 
 //CONFIG
 import colors from '../config/colors';
@@ -25,7 +29,8 @@ export default function MainFormScreen() {
     //VALIDATION SCHEMA
     const validationSchema = Yup.object().shape({
         names: Yup.string().required().label("Nombre"),
-        lastName: Yup.string().required().label("Apellidos")
+        lastName: Yup.string().required().label("Apellidos"),
+        birthdate: Yup.string().required(),
     })
 
     //STATES
@@ -34,6 +39,11 @@ export default function MainFormScreen() {
     const [mode, setMode] = useState('date');
     const [imageUri, setimageUri] = useState();
     const [userBirthday, setUserBirthday] = useState('Fecha de nacimiento');
+    const [spinner, setSpinner] = useState(false);
+
+    //HOOKS
+    const location = useLocation();
+    console.log(location);
 
     //FUNCTIONS
     const showDatepicker = () => {
@@ -41,9 +51,6 @@ export default function MainFormScreen() {
         setMode('date'); 
     };
 
-    //HOOKS
-    const location = useLocation();
-    console.log(location);
 
     const onChange = (event) => {
         const newDate = new Date(event.nativeEvent.timestamp);
@@ -59,8 +66,19 @@ export default function MainFormScreen() {
         setDate(newDate);
     };
 
+    const handleSubmit = async (values) => {
+        console.log(values);
+        setSpinner(true);
+        const result = await general.sendForm({
+            ...values,
+            birthdate: userBirthday,
+            location: location,
+        })
+    }
+
     return (
         <Screen>
+            <Spinner visible={spinner} />
             <View style={{ flex: 1, backgroundColor:"blue" }} >
                 <Header
                     centerComponent={{ text: 'FORMULARIO', style: { color: '#fff', fontWeight: 'bold' } }}
@@ -69,11 +87,11 @@ export default function MainFormScreen() {
                 />
 
                 <Formik
-                    initialValues={{ names: '', lastName: '', birthDate: '' }}
-                    onSubmit={values => console.log(values)}
+                    initialValues={{ names: '', lastName: '', image: '', birthdate: '' }}
+                    onSubmit={handleSubmit}
                     validationSchema={validationSchema}
                 >
-                    {({ handleChange, handleSubmit, errors, setFieldTouched, touched }) => (
+                    {({ handleChange, handleSubmit, errors, setFieldTouched, touched, values }) => (
                         <>
                             <View style={{flexDirection:"column"}}>
 
@@ -122,12 +140,12 @@ export default function MainFormScreen() {
                                         />
                                     </View>
 
-                                    <View style={{marginTop: 10, alignItems: 'center'}}>
+                                    <View style={styles.imagePicker}>
                                         <ImagePickerInput
                                             imageUri={imageUri}
                                             onChangeImage={(uri) => {
-                                            handleChange('image')(uri);
-                                            setimageUri(uri);
+                                                values.image = uri;
+                                                setimageUri(uri);
                                             }}
                                         />
                                     </View>
@@ -178,4 +196,8 @@ const styles = StyleSheet.create({
         marginBottom: 15,
         marginTop:20
     },
+    imagePicker: {
+        marginTop: 10, 
+        alignItems: 'center',
+    }
 })
