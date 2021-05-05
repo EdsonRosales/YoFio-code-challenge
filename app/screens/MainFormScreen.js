@@ -18,6 +18,9 @@ import colors from '../config/colors';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 
+//CUSTOM HOOKS
+import useLocation from '../hooks/useLocation';
+
 export default function MainFormScreen() {
     //VALIDATION SCHEMA
     const validationSchema = Yup.object().shape({
@@ -30,12 +33,17 @@ export default function MainFormScreen() {
     const [date, setDate] = useState(new Date());
     const [mode, setMode] = useState('date');
     const [imageUri, setimageUri] = useState();
+    const [userBirthday, setUserBirthday] = useState('Fecha de nacimiento');
 
     //FUNCTIONS
     const showDatepicker = () => {
         setShow(true);
         setMode('date'); 
     };
+
+    //HOOKS
+    const location = useLocation();
+    console.log(location);
 
     const onChange = (event) => {
         const newDate = new Date(event.nativeEvent.timestamp);
@@ -47,7 +55,7 @@ export default function MainFormScreen() {
             : parseInt(newDate.getMonth(), 10) + 1;
         const year = newDate.getFullYear();
         setShow(Platform.OS === 'ios');
-        setUserBirthday(`${day}/${month}/${year}`);
+        setUserBirthday(`${year}-${month}-${day}`);
         setDate(newDate);
     };
 
@@ -90,7 +98,7 @@ export default function MainFormScreen() {
                                         <View>
                                             <ButtonDatePicker 
                                                 onPress={() => showDatepicker()}
-                                                title="Fecha de Nacimiento"
+                                                title={userBirthday}
                                             />
                                         </View>
 
