@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
 import { StyleSheet, Text, TextInput, View } from 'react-native'
 import { Header } from 'react-native-elements';
+import Button from '../components/basicComponents/Button';
 import Screen from '../components/basicComponents/Screen';
 import ButtonDatePicker from '../components/customComponents/ButtonDatePicker';
 import CustomDatePicker from '../components/customComponents/CustomDatePicker';
+import ImagePickerInput from '../components/customComponents/ImagePickerInput';
 import colors from '../config/colors';
 
 export default function MainFormScreen() {
@@ -12,6 +14,7 @@ export default function MainFormScreen() {
     const [show, setShow] = useState(false);
     const [date, setDate] = useState(new Date());
     const [mode, setMode] = useState('date');
+    const [imageUri, setimageUri] = useState();
 
     //FUNCTIONS
     const showDatepicker = () => {
@@ -73,6 +76,23 @@ export default function MainFormScreen() {
                                 } else setShow(false);
                                 }}
                                 onClose={() => setShow(false)}
+                            />
+                        </View>
+
+                        <View style={{marginTop: 10, alignItems: 'center'}}>
+                            <ImagePickerInput
+                                imageUri={imageUri}
+                                onChangeImage={(uri) => {
+                                handleChange('image')(uri);
+                                setimageUri(uri);
+                                }}
+                            />
+                        </View>
+                        
+                        <View style={{marginTop: 10}}>
+                            <Button
+                                title="Guardar"
+                                // onPress={handleSubmit}
                             />
                         </View>
                     </View>
