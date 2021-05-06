@@ -1,3 +1,3 @@
 export default {
-    url: "https://tech-challenge-v2.herokuapp.com/",
+    url: "http://tech-challenge-v2.herokuapp.com",
 }

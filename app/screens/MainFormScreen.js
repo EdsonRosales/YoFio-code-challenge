@@ -30,7 +30,6 @@ export default function MainFormScreen() {
     const validationSchema = Yup.object().shape({
         names: Yup.string().required().label("Nombre"),
         lastName: Yup.string().required().label("Apellidos"),
-        birthdate: Yup.string().required(),
     })
 
     //STATES
@@ -43,7 +42,7 @@ export default function MainFormScreen() {
 
     //HOOKS
     const location = useLocation();
-    console.log(location);
+    // console.log(location);
 
     //FUNCTIONS
     const showDatepicker = () => {
@@ -67,14 +66,33 @@ export default function MainFormScreen() {
     };
 
     const handleSubmit = async (values) => {
-        console.log(values);
+
+        const time = () => {
+            const timestamp = Math.floor(new Date().getTime() / 1000);
+            return timestamp;
+        }
+
+        const imageExt = (imageUri) => {
+            const ext = imageUri.split('.').pop();
+            return ext;
+        }
+
+        const photo = time().toString() + '.' + imageExt(imageUri) + 'image/jpeg' + imageUri
+        console.log(photo);
+            
+
         setSpinner(true);
-        const result = await general.sendForm({
-            ...values,
-            birthdate: userBirthday,
-            location: location,
-        })
-    }
+        const result = await general.sendForm(
+            values.names,
+            values.lastName,
+            userBirthday,
+            imageUri,
+            location,
+        )
+        setSpinner(false);
+        
+        alert("¡Envio de información exitosa!");
+    };
 
     return (
         <Screen>
@@ -87,7 +105,7 @@ export default function MainFormScreen() {
                 />
 
                 <Formik
-                    initialValues={{ names: '', lastName: '', image: '', birthdate: '' }}
+                    initialValues={{ names: '', lastName: ''}}
                     onSubmit={handleSubmit}
                     validationSchema={validationSchema}
                 >
@@ -128,7 +146,7 @@ export default function MainFormScreen() {
                                             textColor="grey"
                                             locale="es-ES"
                                             style={{
-                                            borderRadius: 10,
+                                                borderRadius: 10,
                                             }}
                                             onChange={(option) => {
                                             if (option.type !== 'dismissed') {
@@ -144,13 +162,12 @@ export default function MainFormScreen() {
                                         <ImagePickerInput
                                             imageUri={imageUri}
                                             onChangeImage={(uri) => {
-                                                values.image = uri;
                                                 setimageUri(uri);
                                             }}
                                         />
                                     </View>
                                     
-                                    <View style={{marginTop: 10}}>
+                                    <View style={{marginTop: 25}}>
                                         <Button
                                             title="Guardar"
                                             onPress={handleSubmit}
@@ -172,7 +189,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         backgroundColor:"white",
         borderTopLeftRadius:25,
-        borderTopRightRadius:25
+        borderTopRightRadius:25,
     },
     shadowBox: {
         shadowColor: colors.black,
@@ -197,7 +214,7 @@ const styles = StyleSheet.create({
         marginTop:20
     },
     imagePicker: {
-        marginTop: 10, 
+        marginTop: 25, 
         alignItems: 'center',
     }
 })
